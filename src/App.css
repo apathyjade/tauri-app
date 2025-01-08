@@ -3,7 +3,88 @@
 }
 
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafb);
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.ollama-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.ollama-section input {
+  flex: 1;
+  margin-right: 0.5rem;
+}
+
+.ollama-section button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ollama-section button:hover {
+  background: #535bf2;
+}
+
+.ollama-section button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.ollama-response {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.network-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.interface-list {
+  margin: 1rem 0;
+}
+
+.interface-item {
+  background: white;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.interface-item h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.interface-item p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #535bf2;
 }
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
@@ -113,4 +194,28 @@ button {
   button:active {
     background-color: #0f0f0f69;
   }
+}
+
+.network-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.interface-list {
+  margin: 1rem 0;
+}
+
+.network-section button {
+  padding: 0.5rem 1rem;
+  background-color: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.network-section button:hover {
+  background-color: #535bf2;
 }

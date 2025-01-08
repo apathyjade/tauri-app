@@ -3,9 +3,22 @@ import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/core";
 import "./App.css";
 
+interface NetworkInterface {
+  name: string;
+  details: string;
+}
+
+interface OllamaResponse {
+  response: string;
+}
+
 function App() {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [interfaces, setInterfaces] = useState<NetworkInterface[]>([]);
+  const [ollamaPrompt, setOllamaPrompt] = useState("");
+  const [ollamaResponse, setOllamaResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
@@ -44,6 +57,69 @@ function App() {
         <button type="submit">Greet</button>
       </form>
       <p>{greetMsg}</p>
+
+      <div className="ollama-section">
+        <h2>Ollama Chat</h2>
+        <form
+          className="row"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setIsLoading(true);
+            try {
+              const response = await invoke<OllamaResponse>("query_ollama", {
+                prompt: ollamaPrompt,
+              });
+              setOllamaResponse(response.response);
+            } catch (error) {
+              console.error("Ollama query failed:", error);
+              setOllamaResponse("Error: " + (error as Error).message);
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+        >
+          <input
+            value={ollamaPrompt}
+            onChange={(e) => setOllamaPrompt(e.currentTarget.value)}
+            placeholder="Ask me anything..."
+            disabled={isLoading}
+          />
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Thinking..." : "Ask"}
+          </button>
+        </form>
+        {ollamaResponse && (
+          <div className="ollama-response">
+            <p>{ollamaResponse}</p>
+          </div>
+        )}
+      </div>
+
+      <div className="network-section">
+        <h2>Network Interfaces</h2>
+        <div className="interface-list">
+          {interfaces.map((iface, index) => (
+            <div key={index} className="interface-item">
+              <h3>{iface.name}</h3>
+              <p>{iface.details}</p>
+            </div>
+          ))}
+        </div>
+        <button onClick={async () => {
+          try {
+            const data = await invoke<Record<string, string>>("get_network_interfaces");
+            const formattedInterfaces = Object.entries(data).map(([name, details]) => ({
+              name,
+              details
+            }));
+            setInterfaces(formattedInterfaces);
+          } catch (error) {
+            console.error("Failed to get network interfaces:", error);
+          }
+        }}>
+          Refresh Interfaces
+        </button>
+      </div>
     </main>
   );
 }
