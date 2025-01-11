@@ -2,8 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::collections::HashMap;
-use tauri::Manager;
-use sysinfo::{System, Networks, SystemExt, NetworksExt, NetworkExt};
+use sysinfo::{System, SystemExt, NetworksExt, NetworkExt};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -32,7 +31,7 @@ async fn query_ollama(prompt: String) -> Result<OllamaResponse, String> {
 
 #[tauri::command]
 fn get_network_interfaces() -> HashMap<String, String> {
-    let mut sys = System::new_all();
+    let sys = System::new_all();
     
     let mut interfaces = HashMap::new();
     
