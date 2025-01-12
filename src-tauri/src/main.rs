@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::collections::HashMap;
-use sysinfo::{System, SystemExt, NetworksExt, NetworkExt};
+use sysinfo::{System, SystemExt, NetworksExt, NetworkExt, CpuExt, DiskExt};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
@@ -29,14 +29,49 @@ async fn query_ollama(prompt: String) -> Result<OllamaResponse, String> {
     Ok(response)
 }
 
+#[derive(Serialize)]
+struct SystemInfo {
+    cpu: Vec<String>,
+    memory: String,
+    disks: Vec<String>,
+    networks: HashMap<String, String>,
+}
+
 #[tauri::command]
-fn get_network_interfaces() -> HashMap<String, String> {
-    let sys = System::new_all();
-    
-    let mut interfaces = HashMap::new();
-    
+fn get_system_info() -> SystemInfo {
+    let mut sys = System::new_all();
+    sys.refresh_all();
+
+    // 获取CPU信息
+    let cpus: Vec<String> = sys.cpus()
+        .iter()
+        .map(|cpu| format!("{}: {} MHz", cpu.name(), cpu.frequency()))
+        .collect();
+
+    // 获取内存信息
+    let memory = format!(
+        "Total: {} MB, Used: {} MB",
+        sys.total_memory() / 1024 / 1024,
+        sys.used_memory() / 1024 / 1024
+    );
+
+    // 获取磁盘信息
+    let disks: Vec<String> = sys.disks()
+        .iter()
+        .map(|disk| {
+            format!(
+                "{}: {} GB / {} GB",
+                disk.name().to_string_lossy(),
+                disk.available_space() / 1024 / 1024 / 1024,
+                disk.total_space() / 1024 / 1024 / 1024
+            )
+        })
+        .collect();
+
+    // 获取网络接口信息
+    let mut networks = HashMap::new();
     for (interface_name, data) in sys.networks().iter() {
-        interfaces.insert(
+        networks.insert(
             interface_name.to_string(),
             format!(
                 "Received: {} B, Transmitted: {} B, MAC: {:?}",
@@ -46,13 +81,18 @@ fn get_network_interfaces() -> HashMap<String, String> {
             )
         );
     }
-    
-    interfaces
+
+    SystemInfo {
+        cpu: cpus,
+        memory,
+        disks,
+        networks,
+    }
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_network_interfaces, query_ollama])
+        .invoke_handler(tauri::generate_handler![get_system_info, query_ollama])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
