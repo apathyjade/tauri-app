@@ -10,11 +10,17 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@lexical/dragon": "^0.23.1",
+    "@lexical/markdown": "^0.23.1",
+    "@lexical/react": "^0.23.1",
+    "@lexical/rich-text": "^0.23.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "lexical": "^0.23.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.1",
+    "sass-embedded": "^1.83.4"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
