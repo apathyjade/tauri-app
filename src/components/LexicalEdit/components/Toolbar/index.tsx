@@ -1,8 +1,10 @@
 
-import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor } from "lexical";
+import { $createParagraphNode, $createTextNode, $getRoot, $getSelection, $getTextContent, $isRangeSelection, LexicalEditor, FORMAT_TEXT_COMMAND } from "lexical";
 import $css from "./index.module.scss";
 import { $createHeadingNode, $isHeadingNode, HeadingTagType } from "@lexical/rich-text";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+
+import { $patchStyleText, $setBlocksType } from "@lexical/selection"
 
 const btns = [
   {
@@ -55,9 +57,35 @@ const updateBlock = (editor: LexicalEditor, key: HeadingTagType) => {
         headingNode.selectEnd();
       }
     }
-
   });
 }
+
+const updateTest = (editor: LexicalEditor) => {
+  editor.update(() => {
+    const selection = $getSelection();
+    if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      
+      console.log(
+        selection.getNodes(),
+        // selection?.getTextContent(),
+        anchorNode,
+        // $getTextContent(),
+        // $getRoot(),
+      );
+      // $setBlocksType(selection, () => $createHeadingNode('h1'));
+      $patchStyleText(selection, {
+        'font-size': '16px',
+      });
+
+      editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code');
+
+    }
+    // const TextNode = $createTextNode();
+    // TextNode.
+
+  })
+};
 
 const Btn = ({ editor, item }: any) => {
   return <div
@@ -73,6 +101,10 @@ const Toolbar = () => {
       {
         btns.map(item => (<Btn key={item.key} editor={editor} item={item} />))
       }
+      <div
+        className={$css.btn}
+        onClick={() => updateTest(editor as LexicalEditor)}
+      >Test</div>
     </div>
   )
 };
