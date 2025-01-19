@@ -11,6 +11,9 @@ importers:
       '@lexical/dragon':
         specifier: ^0.23.1
         version: 0.23.1
+      '@lexical/list':
+        specifier: ^0.23.1
+        version: 0.23.1
       '@lexical/markdown':
         specifier: ^0.23.1
         version: 0.23.1

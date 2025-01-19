@@ -7,18 +7,19 @@ import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
-import { HeadingNode } from "@lexical/rich-text"
+import { HeadingNode, QuoteNode } from "@lexical/rich-text"
 import { EditorContext } from "./context";
 import Toolbar from "./components/Toolbar";
+
+import theme from './theme';
 
 import $css from "./index.module.scss";
 import DraggableBlockPlugin from "./components/DraggableBlockPlugin";
 
 const initialConfig = {
   namespace: 'MyEditor',
-  theme: {
-  },
-  nodes: [HeadingNode],
+  theme,
+  nodes: [HeadingNode, QuoteNode],
   onError: console.error
 };
 
