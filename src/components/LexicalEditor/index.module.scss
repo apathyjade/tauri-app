@@ -1,0 +1,32 @@
+
+.container {
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  // box-shadow: -4px 0px 6px 0px rgba(73,95,137,0.22);
+  border: 1px solid #DFE2E6;
+  height: 100%;
+  &.full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  > :nth-child(n) {
+    flex: 0 0 auto;
+  }
+  .editor-warp {
+    flex: 1 1 auto;
+    padding: 8px 12px;
+    // background: #333332;
+    // border: 1px solid #D7DAE1;
+    border: none !important;
+    outline: 1px solid #D7DAE1;
+    // color: #fff;
+    font-size: 14px;
+    line-height: 20px;
+    overflow-y: auto;
+  }
+}
