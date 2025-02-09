@@ -1,7 +1,4 @@
-import { $getRoot, $getSelection, Klass, LexicalNode } from 'lexical';
-import { useEffect, useState } from 'react';
-// import { TRANSFORMERS } from '@lexical/markdown';
-
+import { useState, useCallback } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -21,32 +18,38 @@ import classNames from 'classnames';
 import { ImageNode } from './nodes/ImgNode/ImageNode';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { EditorState } from 'lexical';
 
-// When the editor changes, you can get notified via the
-// LexicalOnChangePlugin!
-function onChange(editorState) {
-  editorState.read(() => {
-    // Read the contents of the EditorState here.
-    // const root = $getRoot();
-    // const selection = $getSelection();
-
-    // console.log(root, selection);
-  });
-}
 
 const initialConfig = {
   namespace: 'MyEditor',
   theme: theme,
   nodes: [
-    HeadingNode, QuoteNode, ListNode, ListItemNode, ImageNode, TableCellNode, TableNode, TableRowNode,
-    CodeHighlightNode, CodeNode,
-  ],
-  onError: console.error,
+    HeadingNode,
+    QuoteNode,
+    ListNode,
+    ListItemNode,
+    ImageNode,
+    TableCellNode,
+    TableNode,
+    TableRowNode,
+    CodeHighlightNode,
+    CodeNode,
+  ] as any,
+  onError: (error: Error) => {
+    console.error(error);
+  },
 };
 
 
 function Editor() {
   const [isFull, setFull] = useState(false);
+
+  const onChange = useCallback((editorState: EditorState) => {
+    editorState.read(() => {
+      // Handle editor state changes here
+    });
+  }, []);
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
