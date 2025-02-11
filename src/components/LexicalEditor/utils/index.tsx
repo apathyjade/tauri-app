@@ -6,6 +6,7 @@ import { $patchStyleText, $setBlocksType } from '@lexical/selection';
 import { $createListNode, $isListNode } from '@lexical/list';
 import { $createTableNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
 import { $createImageNode } from '../nodes/ImgNode/ImageNode';
+import { $createLineDividerNode } from '../nodes/LineDivider';
 
 import { service } from '@/helper';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
@@ -26,6 +27,7 @@ export enum BlockActionType {
   quote = 'quote',
   list = 'list',
   image = 'image',
+  line_divider = 'line_divider',
   table = 'table',
   code = 'code',
 }
@@ -78,6 +80,8 @@ export type BlockAction = {
     height?: number;
     key?: string;
   };
+} | {
+  type: BlockActionType.line_divider;
 } | { type: BlockActionType.table; params: { columns: number; rows: number } };
 
 export type InlineAction = {
@@ -123,9 +127,13 @@ const setBlocks = (editor: LexicalEditor, selection: BaseSelection, action: Bloc
       $insertNodes([$createImageNode(action.params)]);
       break;
     }
+    case BlockActionType.line_divider: {
+      $insertNodeToNearestRoot($createLineDividerNode() as unknown as any);
+      break;
+    }
     case BlockActionType.table: {
       $insertNodeToNearestRoot(
-       ($createTableNodeWithDimensions(action.params.rows, action.params.columns, true)) as unknown as LexicalNode,
+       ($createTableNodeWithDimensions(action.params.rows, action.params.columns, true)) as unknown as any,
       );
       break;
     }

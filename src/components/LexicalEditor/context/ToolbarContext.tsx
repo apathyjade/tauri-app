@@ -79,6 +79,12 @@ actionMap.set(BlockActionType.code, (editor: LexicalEditor, item: ToolbarItem) =
   } as BlockAction);
 });
 
+actionMap.set(BlockActionType.line_divider, (editor: LexicalEditor, item: ToolbarItem) => {
+  updateBlock(editor, {
+    type: item.actionType,
+  } as BlockAction);
+});
+
 
 actionMap.set(InlineActionType.TextFormat, (editor: LexicalEditor, item: ToolbarItem) => {
   updateText(editor, {
@@ -161,9 +167,8 @@ const toolbarActions: ToolbarItem[] = [
     key: 'line',
     icon: faMinus,
     tip: '分割线',
-    actionType: ActionTypeEnum.FORMAT_TEXT_COMMAND,
+    actionType: BlockActionType.line_divider,
   },
-
   {
     label: '引用',
     icon: faQuoteLeft,

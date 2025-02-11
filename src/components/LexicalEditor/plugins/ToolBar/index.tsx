@@ -14,6 +14,8 @@ import { $setBlocksType } from '@lexical/selection';
 import { $createParagraphNode, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, LexicalEditor, TextFormatType } from 'lexical';
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
 import { useCallback } from 'react';
+import { $createLineDividerNode } from '../../nodes/LineDivider';
+import { $insertNodeToNearestRoot } from '@lexical/utils';
 
 
 function ToolbarActionItem({ editor, item, children }: { editor: LexicalEditor; item: ToolbarItem; children: React.ReactNode }) {

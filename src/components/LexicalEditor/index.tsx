@@ -16,6 +16,7 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import classNames from 'classnames';
 import { ImageNode } from './nodes/ImgNode/ImageNode';
+import { LineDividerNode } from './nodes/LineDivider';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { CodeHighlightNode, CodeNode } from '@lexical/code';
 import { EditorState } from 'lexical';
@@ -30,6 +31,7 @@ const initialConfig = {
     ListNode,
     ListItemNode,
     ImageNode,
+    LineDividerNode,
     TableCellNode,
     TableNode,
     TableRowNode,
