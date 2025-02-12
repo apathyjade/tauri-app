@@ -7,6 +7,8 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 
+import {HorizontalRulePlugin} from '@lexical/react/LexicalHorizontalRulePlugin';
+
 import ToolBar from './plugins/ToolBar';
 import $css from './index.module.scss';
 import theme from './themes/StickyEditorTheme';
@@ -14,6 +16,7 @@ import theme from './themes/StickyEditorTheme';
 import { ToolbarContext } from './context/ToolbarContext';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
+import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import classNames from 'classnames';
 import { ImageNode } from './nodes/ImgNode/ImageNode';
 import { LineDividerNode } from './nodes/LineDivider';
@@ -37,6 +40,7 @@ const initialConfig = {
     TableRowNode,
     CodeHighlightNode,
     CodeNode,
+    HorizontalRuleNode,
   ] as any,
   onError: (error: Error) => {
     console.error(error);
@@ -67,6 +71,7 @@ function Editor() {
           <OnChangePlugin onChange={onChange} />
           <HistoryPlugin />
           <AutoFocusPlugin />
+          <HorizontalRulePlugin />
         </ToolbarContext>
       </div>
     </LexicalComposer>

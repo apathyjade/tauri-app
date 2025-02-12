@@ -5,6 +5,7 @@ import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/r
 import { $patchStyleText, $setBlocksType } from '@lexical/selection';
 import { $createListNode, $isListNode } from '@lexical/list';
 import { $createTableNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
+import {INSERT_HORIZONTAL_RULE_COMMAND} from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createImageNode } from '../nodes/ImgNode/ImageNode';
 import { $createLineDividerNode } from '../nodes/LineDivider';
 
@@ -128,7 +129,8 @@ const setBlocks = (editor: LexicalEditor, selection: BaseSelection, action: Bloc
       break;
     }
     case BlockActionType.line_divider: {
-      $insertNodeToNearestRoot($createLineDividerNode() as unknown as any);
+      editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
+      // $insertNodeToNearestRoot($createLineDividerNode() as unknown as any);
       break;
     }
     case BlockActionType.table: {
