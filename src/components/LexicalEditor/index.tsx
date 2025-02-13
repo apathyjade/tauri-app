@@ -53,7 +53,7 @@ function Editor() {
 
   const onChange = useCallback((editorState: EditorState) => {
     editorState.read(() => {
-      // Handle editor state changes here
+      console.log(editorState.toJSON());
     });
   }, []);
 
