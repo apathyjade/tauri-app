@@ -18,14 +18,16 @@
   }
   .editor-warp {
     flex: 1 1 auto;
+    height: 100%;
+    overflow: hidden;
+  }
+  .editor-content {
     padding: 8px 12px;
-    // background: #333332;
-    // border: 1px solid #D7DAE1;
     border: none !important;
     outline: 1px solid #D7DAE1;
-    // color: #fff;
     font-size: 14px;
     line-height: 20px;
+    height: 100%;
     overflow-y: auto;
   }
 }
