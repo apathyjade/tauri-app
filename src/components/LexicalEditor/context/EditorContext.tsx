@@ -1,7 +1,5 @@
 
-import { $createHeadingNode, HeadingTagType } from '@lexical/rich-text';
-import { $setBlocksType } from '@lexical/selection';
-import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, LexicalEditor } from 'lexical';
+import { $getSelection, $isRangeSelection, LexicalEditor } from 'lexical';
 import React, {
   createContext,
   ReactNode,
@@ -9,6 +7,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -18,6 +17,8 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { BlockAction, BlockActionType, HeadingTag, InlineActionType, ListType, TextFormatType, updateBlock, updateText, uploadImg } from '../utils';
+import { getSelectedNode } from '../utils/getSelectedNode';
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
 
 export enum ActionTypeEnum {
   maximize = 'maximize',
@@ -35,73 +36,102 @@ export interface ToolbarItem {
   actionParams?: { tag: HeadingTag } | { rows: number; columns: number };
 }
 
+type ContextShape = {
+  isFull: boolean;
+  setFull: (val: boolean) => void;
+  isLinkEditMode: boolean;
+  setIsLinkEditMode: (val: boolean) => void;
+  toolbarActions: ToolbarItem[];
+  toolbarState: ToolbarState;
+  floatingAnchorElem: HTMLDivElement | null,
+  setFloatingAnchorElem: React.Dispatch<React.SetStateAction<HTMLDivElement | null>>;
+  updateToolbarState: <Key extends ToolbarStateKey>(
+    key: Key,
+    value: ToolbarStateValue<Key>,
+  ) => void;
+};
+
+const Context = createContext<ContextShape>(null as any);
+
+
 export const actionMap = new Map();
-actionMap.set(BlockActionType.heading, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-    params: item.actionParams,
-  } as BlockAction);
-});
-actionMap.set(BlockActionType.image, (editor: LexicalEditor, item: ToolbarItem) => {
-  uploadImg().then((data) => {
+
+const registerAction = (contextRef: React.MutableRefObject<ContextShape>) => {
+  actionMap.set(BlockActionType.heading, (editor: LexicalEditor, item: ToolbarItem) => {
     updateBlock(editor, {
       type: item.actionType,
-      params: {
-        params: false,
-        width: 240,
-        src: data,
-      },
+      params: item.actionParams,
     } as BlockAction);
   });
-});
-
-actionMap.set(BlockActionType.table, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-    params: item.actionParams,
-  } as BlockAction);
-});
-actionMap.set(BlockActionType.list, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-    params: { listType: item.key },
-  } as BlockAction);
-});
-
-actionMap.set(BlockActionType.quote, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-  } as BlockAction);
-});
-actionMap.set(BlockActionType.code, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-  } as BlockAction);
-});
-
-actionMap.set(BlockActionType.line_divider, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateBlock(editor, {
-    type: item.actionType,
-  } as BlockAction);
-});
-
-
-actionMap.set(InlineActionType.TextFormat, (editor: LexicalEditor, item: ToolbarItem) => {
-  updateText(editor, {
-    type: InlineActionType.TextFormat,
-    formatType: item.key as TextFormatType,
+  actionMap.set(BlockActionType.image, (editor: LexicalEditor, item: ToolbarItem) => {
+    uploadImg().then((data) => {
+      updateBlock(editor, {
+        type: item.actionType,
+        params: {
+          params: false,
+          width: 240,
+          src: data,
+        },
+      } as BlockAction);
+    });
   });
-});
 
-actionMap.set(ActionTypeEnum.FORMAT_TEXT_COMMAND, (editor: LexicalEditor, formatType: TextFormatType) => {
-  editor.update(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) {
-      // 直接切换格式（支持多格式共存）
-      editor.dispatchCommand(FORMAT_TEXT_COMMAND, formatType);
-    }
+  actionMap.set(BlockActionType.table, (editor: LexicalEditor, item: ToolbarItem) => {
+    updateBlock(editor, {
+      type: item.actionType,
+      params: item.actionParams,
+    } as BlockAction);
   });
-});
+  actionMap.set(BlockActionType.list, (editor: LexicalEditor, item: ToolbarItem) => {
+    updateBlock(editor, {
+      type: item.actionType,
+      params: { listType: item.key },
+    } as BlockAction);
+  });
+
+  actionMap.set(BlockActionType.quote, (editor: LexicalEditor, item: ToolbarItem) => {
+    updateBlock(editor, {
+      type: item.actionType,
+    } as BlockAction);
+  });
+
+  actionMap.set(BlockActionType.line_divider, (editor: LexicalEditor, item: ToolbarItem) => {
+    updateBlock(editor, {
+      type: item.actionType,
+    } as BlockAction);
+  });
+
+
+  actionMap.set(InlineActionType.TextFormat, (editor: LexicalEditor, item: ToolbarItem) => {
+    updateText(editor, {
+      type: InlineActionType.TextFormat,
+      formatType: item.key as TextFormatType,
+    });
+  });
+
+  actionMap.set(InlineActionType.Link, (editor: LexicalEditor) => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const node = getSelectedNode(selection);
+        const parent = node.getParent();
+        if (!($isLinkNode(parent) || $isLinkNode(node))) {
+          contextRef.current.setIsLinkEditMode(true);
+          editor.dispatchCommand(TOGGLE_LINK_COMMAND, 'https://');
+          console.log('isLinkNode')
+        } else {
+          contextRef.current.setIsLinkEditMode(false);
+          editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+        }
+      }
+    });
+  });
+}
+const useRegisterAction = (context: ContextShape) => {
+  const centextRef = useRef(context);
+  centextRef.current = context;
+  useState(() => registerAction(centextRef))
+}
 
 const toolbarActions: ToolbarItem[] = [
   {
@@ -179,15 +209,15 @@ const toolbarActions: ToolbarItem[] = [
   {
     label: '代码段',
     icon: faCode,
-    key: BlockActionType.code,
-    actionType: BlockActionType.code,
+    key: TextFormatType.code,
+    actionType: InlineActionType.TextFormat,
   },
 
   {
     label: '添加链接',
     icon: faLink,
     key: 'link',
-    actionType: ActionTypeEnum.FORMAT_TEXT_COMMAND,
+    actionType: InlineActionType.Link,
   },
   {
     label: '上传图片',
@@ -246,28 +276,17 @@ type ToolbarState = typeof INITIAL_TOOLBAR_STATE;
 type ToolbarStateKey = keyof ToolbarState;
 type ToolbarStateValue<Key extends ToolbarStateKey> = ToolbarState[Key];
 
-type ContextShape = {
-  isFull: boolean;
-  setFull: (val: boolean) => void;
-  toolbarActions: ToolbarItem[];
-  toolbarState: ToolbarState;
-  updateToolbarState: <Key extends ToolbarStateKey>(
-    key: Key,
-    value: ToolbarStateValue<Key>,
-  ) => void;
-};
 
-const Context = createContext<ContextShape | undefined>(undefined);
-
-export const ToolbarContext = ({
+export const EditorContext = ({
   children,
-  isFull,
-  setFull,
 }: {
   children: ReactNode;
-  isFull: boolean;
-  setFull: (v: boolean) => void;
 }): JSX.Element => {
+  
+  const [isFull, setFull] = useState(false);
+  const [floatingAnchorElem, setFloatingAnchorElem] =
+    useState<HTMLDivElement | null>(null);
+  const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
   const [toolbarState, setToolbarState] = useState(INITIAL_TOOLBAR_STATE);
 
   const updateToolbarState = useCallback(
@@ -289,7 +308,6 @@ export const ToolbarContext = ({
     });
   }, []);
 
-
   const contextValue = useMemo(() => {
     return {
       toolbarActions: toolbarActions.filter(it => {
@@ -305,17 +323,32 @@ export const ToolbarContext = ({
       updateToolbarState,
       isFull,
       setFull,
+      floatingAnchorElem,
+      setFloatingAnchorElem,
+      isLinkEditMode,
+      setIsLinkEditMode,
     };
-  }, [isFull, toolbarState, updateToolbarState]);
+  }, [
+    toolbarState,
+    updateToolbarState,
+    isFull,
+    setFull,
+    floatingAnchorElem,
+    setFloatingAnchorElem,
+    isLinkEditMode,
+    setIsLinkEditMode,
+  ]);
+
+  useRegisterAction(contextValue);
 
   return <Context.Provider value={contextValue}>{children}</Context.Provider>;
 };
 
-export const useToolbarState = () => {
+export const useEditorContext = () => {
   const context = useContext(Context);
 
   if (context === undefined) {
-    throw new Error('useToolbarState must be used within a ToolbarProvider');
+    throw new Error('useEditorContext must be used within a ToolbarProvider');
   }
 
   return context;

@@ -1,22 +1,16 @@
 
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import classNames from 'classnames';
-
+import { useCallback } from 'react';
+import { LexicalEditor } from 'lexical';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
-  useToolbarState,
+  useEditorContext,
   actionMap,
   ToolbarItem,
-} from '../../context/ToolbarContext';
+} from '../../context/EditorContext';
 import $css from './index.module.scss';
-import { $setBlocksType } from '@lexical/selection';
-import { $createParagraphNode, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, LexicalEditor, TextFormatType } from 'lexical';
-import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
-import { useCallback } from 'react';
-import { $createLineDividerNode } from '../../nodes/LineDivider';
-import { $insertNodeToNearestRoot } from '@lexical/utils';
-
 
 function ToolbarActionItem({ editor, item, children }: { editor: LexicalEditor; item: ToolbarItem; children: React.ReactNode }) {
   const onClick = useCallback(() => {
@@ -35,7 +29,7 @@ function ToolbarActionItem({ editor, item, children }: { editor: LexicalEditor; 
 // 操作栏组件
 function Toolbar() {
   const [editor] = useLexicalComposerContext();
-  const { toolbarState, toolbarActions } = useToolbarState();
+  const { toolbarState, toolbarActions } = useEditorContext();
 
   return (
     <div className={classNames($css.container)}>

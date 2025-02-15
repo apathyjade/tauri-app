@@ -1,13 +1,12 @@
 
-import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor, FORMAT_TEXT_COMMAND, RangeSelection, ElementNode, $isElementNode, BaseSelection, $insertNodes, LexicalNode } from 'lexical';
+import { $createParagraphNode, $getSelection, $isRangeSelection, LexicalEditor, FORMAT_TEXT_COMMAND, RangeSelection, $isElementNode, BaseSelection, $insertNodes } from 'lexical';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
 
 import { $patchStyleText, $setBlocksType } from '@lexical/selection';
 import { $createListNode, $isListNode } from '@lexical/list';
-import { $createTableNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
+import { $createTableNodeWithDimensions } from '@lexical/table';
 import {INSERT_HORIZONTAL_RULE_COMMAND} from '@lexical/react/LexicalHorizontalRuleNode';
 import { $createImageNode } from '../nodes/ImgNode/ImageNode';
-import { $createLineDividerNode } from '../nodes/LineDivider';
 
 import { service } from '@/helper';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
@@ -35,6 +34,7 @@ export enum BlockActionType {
 
 export enum InlineActionType {
   TextFormat = 'text-format',
+  Link='link',
 }
 
 export enum HeadingTag {
@@ -56,34 +56,41 @@ export enum TextFormatType {
 }
 
 export type BlockAction = {
-  type: BlockActionType.paragraph;
-} | {
-  type: BlockActionType.heading;
-  params: {
-    tag: HeadingTag;
-  };
-} | {
-  type: BlockActionType.quote;
-} | {
-  type: BlockActionType.code;
-} | {
-  type: BlockActionType.list;
-  params: {
-    listType: ListType;
-  };
-} | {
-  type: BlockActionType.image;
-  params: {
-    src: string;
-    altText: string;
-    maxWidth: number;
-    width?: number;
-    height?: number;
-    key?: string;
-  };
-} | {
-  type: BlockActionType.line_divider;
-} | { type: BlockActionType.table; params: { columns: number; rows: number } };
+    type: BlockActionType.paragraph;
+  } 
+  | {
+    type: BlockActionType.heading;
+    params: {
+      tag: HeadingTag;
+    };
+  } 
+  | {
+    type: BlockActionType.quote;
+  } 
+  | {
+    type: BlockActionType.code;
+  } 
+  | {
+    type: BlockActionType.list;
+    params: {
+      listType: ListType;
+    };
+  } 
+  | {
+    type: BlockActionType.image;
+    params: {
+      src: string;
+      altText: string;
+      maxWidth: number;
+      width?: number;
+      height?: number;
+      key?: string;
+    };
+  } 
+  | {
+    type: BlockActionType.line_divider;
+  } 
+  | { type: BlockActionType.table; params: { columns: number; rows: number } };
 
 export type InlineAction = {
   type: InlineActionType.TextFormat;
@@ -130,7 +137,6 @@ const setBlocks = (editor: LexicalEditor, selection: BaseSelection, action: Bloc
     }
     case BlockActionType.line_divider: {
       editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined);
-      // $insertNodeToNearestRoot($createLineDividerNode() as unknown as any);
       break;
     }
     case BlockActionType.table: {
