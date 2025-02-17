@@ -21,7 +21,7 @@ importers:
         specifier: ^0.23.1
         version: 0.23.1
       '@lexical/link':
-        specifier: 0.23.x
+        specifier: ^0.23.1
         version: 0.23.1
       '@lexical/list':
         specifier: ^0.23.1
